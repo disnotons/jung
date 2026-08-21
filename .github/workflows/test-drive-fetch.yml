@@ -1,0 +1,33 @@
+name: Test CW12 Drive package fetch
+
+on:
+  push:
+    branches:
+      - publish/cw12-webbook
+    paths:
+      - '.github/workflows/test-drive-fetch.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download prepared CW12 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://drive.usercontent.google.com/download?id=1o6oT1jOuXdgzi2FK3_BMmYiOfWmIHUW-&export=download&confirm=t'
+          curl -L --fail --retry 2 --connect-timeout 20 "$URL" -o /tmp/cw12.zip
+          echo "bytes=$(stat -c%s /tmp/cw12.zip)"
+          sha256sum /tmp/cw12.zip
+          file /tmp/cw12.zip
+          python - <<'PY'
+          import zipfile
+          p='/tmp/cw12.zip'
+          with zipfile.ZipFile(p) as z:
+              names=z.namelist()
+              print('entries=', len(names))
+              print('has_cw12=', any('cw12-psychology-and-alchemy' in n for n in names))
+          PY
