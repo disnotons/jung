@@ -6,6 +6,11 @@ on:
       - publish/cw12-webbook
     paths:
       - '.github/workflows/test-drive-fetch.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/test-drive-fetch.yml'
 
 permissions:
   contents: read
